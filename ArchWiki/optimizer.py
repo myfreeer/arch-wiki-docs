@@ -121,7 +121,7 @@ class Optimizer:
         for i in self.root.cssselect("img"):
             src = i.get("src")
             if src and src.startswith("/images/"):
-                src = os.path.join(self.relbase, "File:" + os.path.split(src)[1])
+                src = os.path.join(self.relbase, "File__" + os.path.split(src)[1])
                 i.set("src", src)
 
     def fix_footer(self):

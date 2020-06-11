@@ -164,6 +164,18 @@ class ArchWiki(MediaWiki):
     def detect_language(self, title):
         """ Detect language of a given title.
         """
+        title_parts = title.split('/')
+        detected_language = ""
+        if len(title_parts) > 1:
+            for i, title_part in enumerate(title_parts) :
+                title_part, detected_language_part = self.detect_language(title_part)
+                title_parts[i] = title_part
+                if not detected_language:
+                    detected_language = detected_language_part
+                elif detected_language == 'English' and detected_language_part and detected_language_part != 'English':
+                    detected_language = detected_language_part
+            return '/'.join(title_parts), detected_language
+
         pure_title = title
         detected_language = local_language
         match = re.match("^(.+?)([ _]\(([^\(]+)\))?$", title);
@@ -194,11 +206,17 @@ class ArchWiki(MediaWiki):
         if namespace == "Main":
             pattern = "{base}/{langsubtag}/{title}.{ext}"
         elif namespace in ["Talk", "ArchWiki", "ArchWiki_talk", "Template", "Template_talk", "Help", "Help_talk", "Category", "Category_talk"]:
-            pattern = "{base}/{langsubtag}/{namespace}:{title}.{ext}"
+            pattern = "{base}/{langsubtag}/{namespace}__{title}.{ext}"
         elif namespace == "File":
-            pattern = "{base}/{namespace}:{title}"
+            pattern = "{base}/{namespace}__{title}"
         else:
-            pattern = "{base}/{namespace}:{title}.{ext}"
+            pattern = "{base}/{namespace}__{title}.{ext}"
+
+        if title == 'MAC' and lang == "English":
+            title = 'M_A_C'
+
+        if title == 'Network_Configuration' and namespace == 'Category' and lang == "Português":
+            title = 'Network_Configuration_'
 
         path = pattern.format(
             base=basepath,

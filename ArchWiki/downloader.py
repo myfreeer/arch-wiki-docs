@@ -3,6 +3,7 @@
 import os
 import datetime
 import urllib.request
+from .ArchWiki import interlanguage_external;
 
 class Downloader:
     query_allpages = {
@@ -94,6 +95,25 @@ class Downloader:
             fname = os.path.join(self.output_directory, dest)
             self.files.append(fname)
             urllib.request.urlretrieve(link, fname)
+            if dest == 'ArchWikiOffline.css':
+                with open(fname, 'a') as cssFile:
+                    cssFile.write("""
+#p-lang #p-lang-label::after {
+    content: ': ';
+}
+
+#p-lang #p-lang-label,
+#p-lang .body,
+#p-lang .body ul,
+#p-lang .body .interlanguage-link {
+    display: inline;
+    margin-left: 0;
+}
+
+""" + ','.join(['#p-lang .body ul .interwiki-' + l for l in interlanguage_external]) + 
+""" {
+    display: none;
+}""")
 
     def download_images(self):
         print("Downloading images...")

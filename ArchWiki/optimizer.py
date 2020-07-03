@@ -59,6 +59,10 @@ class Optimizer:
     def strip_page(self):
         """ remove elements useless in offline browsing
         """
+        bodyContent = self.root.cssselect('#bodyContent')
+        pLang = self.root.cssselect('#p-lang')
+        if len(pLang) and len(bodyContent):
+            bodyContent[0].insert(0, pLang[0])
 
         for e in self.root.cssselect("#archnavbar, #mw-page-base, #mw-head-base, #mw-navigation"):
             e.getparent().remove(e)
@@ -101,6 +105,13 @@ class Optimizer:
             href = a.get("href")
             if href is not None:
                 href = urllib.parse.unquote(href)
+
+                # 'In other languages' links
+                if href.startswith('https://wiki.archlinux.org/'):
+                    href = href[26::]
+                elif href.startswith('http://wiki.archlinux.org/'):
+                    href = href[25::]
+
                 match = re.match("^/index.php/(.+?)(?:#(.+))?$", str(href))
                 if match:
                     title = self.wiki.resolve_redirect(match.group(1))
